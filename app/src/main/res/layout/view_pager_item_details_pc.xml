@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/p1"
+    android:tag="DETAILS"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/textView"
+        android:elevation="20dp"
+        android:text="Blabla explanation super cool about the postcard\n\n:)"
+        android:onClick="changeScene"
+        android:layout_marginTop="150dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white_shape"
+        android:clickable="true"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:textColor="#000000"/>
+    <ImageView
+        android:id="@+id/imageView"
+        android:elevation="21dp"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/pf_confirmation_badge"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>
