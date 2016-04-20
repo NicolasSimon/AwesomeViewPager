@@ -1,6 +1,7 @@
 package ns.com.horizontalscrollerapp.fragment;
 
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,7 +35,9 @@ public class Fragment0 extends Fragment {
                     if (mCurrentColor >= mColors.length) {
                         mCurrentColor = 0;
                     }
-                    bouncingView.getPaint().setColor(mColors[mCurrentColor]);
+                    Point topLeft = bouncingView.getTopLeft();
+                    Point bottomRight = bouncingView.getBottomRight();
+                    bouncingView.setPaintColor(mColors[mCurrentColor], 600, new Point((bottomRight.x + topLeft.x) / 4, (bottomRight.y + topLeft.y) / 4), 50);
                     bouncingView.startAnim();
                 }
             });

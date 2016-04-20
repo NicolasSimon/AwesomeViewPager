@@ -1,5 +1,8 @@
 package ns.com.horizontalscrollerapp.view;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,8 +11,6 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -22,6 +23,7 @@ import android.view.ViewOutlineProvider;
  */
 public class MyBouncingView extends View {
     private Paint                   mPaint;
+    private Paint                   mOverlayPaint;
     private Path                    path = new Path();
 
     private Point                   mTopLeft;
@@ -44,6 +46,13 @@ public class MyBouncingView extends View {
 
     private boolean                 mIsAnimationRunning = false;
     private boolean                 mIsInitialized = false;
+    private boolean                 mIsChangingPaintColorRunning = false;
+
+    private int                     mPaintColorRadius;
+    private int                     mStartRadius;
+    private int                     mCurrentRadius;
+    private int                     mFinalRadius;
+    private Point                   mPaintColorStartingPoint;
 
     private BouncingViewBehaviour   mBehavior;
 
@@ -57,6 +66,14 @@ public class MyBouncingView extends View {
 
     public MyBouncingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+    public Point getTopLeft() {
+        return (mTopLeft);
+    }
+
+    public Point getBottomRight() {
+        return (mBottomRight);
     }
 
     /**
@@ -94,12 +111,122 @@ public class MyBouncingView extends View {
         mPaint = p;
     }
 
+    private int calculateFinalRadius() {
+        int widthLeft = Math.abs(mPaintColorStartingPoint.x - mTopLeft.x);
+        int widthRight = Math.abs(mPaintColorStartingPoint.x - mTopRight.x);
+        int heightTop = Math.abs(mPaintColorStartingPoint.y - mTopLeft.y);
+        int heightBottom = Math.abs(mPaintColorStartingPoint.y - mBottomLeft.y);
+
+        int maxWidth = Math.max(widthLeft, widthRight);
+        int maxHeight = Math.max(heightBottom, heightTop);
+
+        return ((int)Math.sqrt((maxHeight * maxHeight) + (maxWidth * maxWidth)));
+    }
+
+    /**
+     * Change the paint color using a ArgbEvaluator
+     * @param colorTo The next color of the paint
+     * @param duration the duration of the animation
+     */
+    public void setPaintColor(@NonNull Integer colorTo, int duration, @NonNull Point startingPoint, int startingRadius) {
+        if (mOverlayPaint == null) {
+            initOverlayPaint();
+        }
+        mStartRadius = startingRadius;
+        mCurrentRadius = startingRadius;
+        mPaintColorStartingPoint = startingPoint;
+        mFinalRadius = calculateFinalRadius();
+        final int radiusDiff = mFinalRadius - mCurrentRadius;
+        if (radiusDiff < 0) {
+            mOverlayPaint.setColor(colorTo);
+            mPaint.setColor(colorTo);
+            return;
+        }
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), mOverlayPaint.getColor(), colorTo);
+        colorAnimation.setDuration(duration);
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mIsChangingPaintColorRunning = true;
+                mOverlayPaint.setColor((Integer) animation.getAnimatedValue());
+                if (!mIsAnimationRunning) {
+                    mInstance.invalidate();
+                }
+            }
+        });
+        colorAnimation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mIsChangingPaintColorRunning = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsChangingPaintColorRunning = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                mIsChangingPaintColorRunning = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {}
+        });
+        colorAnimation.start();
+
+        ValueAnimator radiusAnimation = ValueAnimator.ofInt(mStartRadius, mFinalRadius);
+        radiusAnimation.setDuration(duration);
+        radiusAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mIsChangingPaintColorRunning = true;
+                mCurrentRadius = (Integer)animation.getAnimatedValue();
+                if (!mIsAnimationRunning) {
+                    mInstance.invalidate();
+                }
+            }
+        });
+        radiusAnimation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mIsChangingPaintColorRunning = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsChangingPaintColorRunning = false;
+                mPaint.setColor(mOverlayPaint.getColor());
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                mIsChangingPaintColorRunning = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {}
+        });
+        radiusAnimation.start();
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (!mIsInitialized) {
             init(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
         }
+    }
+
+    private void initOverlayPaint() {
+        mOverlayPaint = new Paint();
+        if (mPaint != null) {
+            mOverlayPaint.setColor(mPaint.getColor());
+
+        } else {
+            mOverlayPaint.setColor(Color.RED);
+        }
+        mOverlayPaint.setStrokeWidth(10);
     }
 
     private void initDefaultPaint() {
@@ -240,6 +367,11 @@ public class MyBouncingView extends View {
         path.quadTo(mNoiseLeft.x, mNoiseLeft.y, mTopLeft.x, mTopLeft.y);
 
         canvas.drawPath(path, mPaint);
+
+        if (mIsChangingPaintColorRunning) {
+            canvas.clipPath(path);
+            canvas.drawCircle(mPaintColorStartingPoint.x, mPaintColorStartingPoint.y, mCurrentRadius, mOverlayPaint);
+        }
     }
 
     @Override
