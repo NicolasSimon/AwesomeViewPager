@@ -1,6 +1,5 @@
 package ns.com.horizontalscrollerapp;
 
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ns.com.horizontalscrollerapp.adapter.MyPagerAdapter;
+import ns.com.horizontalscrollerapp.fragment.Fragment0;
 import ns.com.horizontalscrollerapp.fragment.Fragment1;
 import ns.com.horizontalscrollerapp.fragment.Fragment2;
 import ns.com.horizontalscrollerapp.fragment.Fragment3;
 import ns.com.horizontalscrollerapp.view.MyPagerTransformer;
-import ns.com.horizontalscrollerapp.view.MyfunView;
 
 public class MainActivity extends AppCompatActivity {
     private Fragment1               mFrag1;
@@ -26,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private Fragment3               mFrag3;
 
     private ViewPager               mViewPager;
-    private Handler                 mHandler = new Handler();
-    private Runnable                mRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,26 +46,15 @@ public class MainActivity extends AppCompatActivity {
             fragments.add(mFrag1);
             fragments.add(mFrag2);
             fragments.add(mFrag3);
+            fragments.add(new Fragment0());
 
             PagerAdapter realViewPagerAdapter = new MyPagerAdapter(super.getSupportFragmentManager(), fragments);
 
             mViewPager.setAdapter(realViewPagerAdapter);
-            indicator.setViewPager(mViewPager);
-        }
-
-        //final MyfunView funView = (MyfunView) findViewById(R.id.funView);
-
-
-        /*
-        mRunnable = new Runnable() {
-            @Override
-            public void run() {
-                funView.invalidate();
-                mHandler.postDelayed(mRunnable, 20);
+            if (indicator != null) {
+                indicator.setViewPager(mViewPager);
             }
-        };
-
-        mHandler.postDelayed(mRunnable, 100);*/
+        }
     }
 
     public void changeScene(View v) {

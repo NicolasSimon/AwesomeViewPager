@@ -50,6 +50,8 @@ public class Fragment3 extends Fragment {
         mInfoScene = mStartScene;
         mStartScene = tmp;
         mIsShowingDetails = !mIsShowingDetails;
-        TransitionManager.go(mStartScene, mTransition);
+        if (mStartScene != null) {
+            TransitionManager.go(mStartScene, mTransition);
+        }
     }
 }
