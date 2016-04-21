@@ -17,6 +17,7 @@ import ns.com.horizontalscrollerapp.fragment.Fragment0;
 import ns.com.horizontalscrollerapp.fragment.Fragment1;
 import ns.com.horizontalscrollerapp.fragment.Fragment2;
 import ns.com.horizontalscrollerapp.fragment.Fragment3;
+import ns.com.horizontalscrollerapp.fragment.FragmentFocus;
 import ns.com.horizontalscrollerapp.view.MyPagerTransformer;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             fragments.add(mFrag2);
             fragments.add(mFrag3);
             fragments.add(new Fragment0());
+            fragments.add(new FragmentFocus());
 
             PagerAdapter realViewPagerAdapter = new MyPagerAdapter(super.getSupportFragmentManager(), fragments);
 
