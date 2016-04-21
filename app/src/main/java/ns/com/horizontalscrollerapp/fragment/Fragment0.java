@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -28,17 +29,20 @@ public class Fragment0 extends Fragment {
         final MyBouncingView bouncingView = (MyBouncingView) layout.findViewById(R.id.funView);
         if (bouncingView != null) {
             bouncingView.getPaint().setColor(mColors[mCurrentColor]);
-            bouncingView.setOnClickListener(new View.OnClickListener() {
+            bouncingView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View v) {
-                    mCurrentColor += 1;
-                    if (mCurrentColor >= mColors.length) {
-                        mCurrentColor = 0;
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            mCurrentColor += 1;
+                            if (mCurrentColor >= mColors.length) {
+                                mCurrentColor = 0;
+                            }
+                            bouncingView.setPaintColor(mColors[mCurrentColor], 600, new Point((int)event.getRawX(), (int)event.getRawY()), 50);
+                            bouncingView.startAnim();
+                            return (true);
                     }
-                    Point topLeft = bouncingView.getTopLeft();
-                    Point bottomRight = bouncingView.getBottomRight();
-                    bouncingView.setPaintColor(mColors[mCurrentColor], 600, new Point((bottomRight.x + topLeft.x) / 4, (bottomRight.y + topLeft.y) / 4), 50);
-                    bouncingView.startAnim();
+                    return false;
                 }
             });
         }

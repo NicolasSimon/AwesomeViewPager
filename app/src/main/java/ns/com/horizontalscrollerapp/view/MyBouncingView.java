@@ -48,10 +48,7 @@ public class MyBouncingView extends View {
     private boolean                 mIsInitialized = false;
     private boolean                 mIsChangingPaintColorRunning = false;
 
-    private int                     mPaintColorRadius;
-    private int                     mStartRadius;
     private int                     mCurrentRadius;
-    private int                     mFinalRadius;
     private Point                   mPaintColorStartingPoint;
 
     private BouncingViewBehaviour   mBehavior;
@@ -132,11 +129,10 @@ public class MyBouncingView extends View {
         if (mOverlayPaint == null) {
             initOverlayPaint();
         }
-        mStartRadius = startingRadius;
         mCurrentRadius = startingRadius;
         mPaintColorStartingPoint = startingPoint;
-        mFinalRadius = calculateFinalRadius();
-        final int radiusDiff = mFinalRadius - mCurrentRadius;
+        int finalRadius = calculateFinalRadius();
+        final int radiusDiff = finalRadius - mCurrentRadius;
         if (radiusDiff < 0) {
             mOverlayPaint.setColor(colorTo);
             mPaint.setColor(colorTo);
@@ -175,7 +171,7 @@ public class MyBouncingView extends View {
         });
         colorAnimation.start();
 
-        ValueAnimator radiusAnimation = ValueAnimator.ofInt(mStartRadius, mFinalRadius);
+        ValueAnimator radiusAnimation = ValueAnimator.ofInt(startingRadius, finalRadius);
         radiusAnimation.setDuration(duration);
         radiusAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
