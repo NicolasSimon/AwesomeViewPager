@@ -52,7 +52,7 @@ public class FocusView extends View implements View.OnTouchListener {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN :
             case MotionEvent.ACTION_MOVE:
-                mTransparentPosition.set((int)event.getRawX(), (int)event.getRawY());
+                mTransparentPosition.set((int)event.getX(), (int)event.getY());
                 invalidate();
                 return (true);
         }

@@ -38,7 +38,7 @@ public class Fragment0 extends Fragment {
                             if (mCurrentColor >= mColors.length) {
                                 mCurrentColor = 0;
                             }
-                            bouncingView.setPaintColor(mColors[mCurrentColor], 600, new Point((int)event.getRawX(), (int)event.getRawY()), 50);
+                            bouncingView.setPaintColor(mColors[mCurrentColor], 600, new Point((int)event.getX(), (int)event.getY()), 50);
                             bouncingView.startAnim();
                             return (true);
                     }
